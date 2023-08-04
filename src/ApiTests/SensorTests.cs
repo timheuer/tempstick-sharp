@@ -14,7 +14,8 @@ public class SensorTests
     public void SetupTests()
     {
         var builder = new ConfigurationBuilder()
-            .AddUserSecrets("5bcb7714-77a2-46aa-8937-fbcf172873c7");
+            .AddUserSecrets("5bcb7714-77a2-46aa-8937-fbcf172873c7")
+            .AddEnvironmentVariables();
 
         IConfiguration config = builder.Build();
 
