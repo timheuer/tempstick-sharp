@@ -11,4 +11,4 @@ To install TempStickSharp, run the following command in the [Package Manager Con
 TempStickSharp is licensed under the MIT License
 
 ## Icon 
-Thermometer by Anggara Putra from <a href="https://thenounproject.com/browse/icons/term/thermometer/" target="_blank" title="Thermometer Icons">Noun Project</a> (CC BY 3.0)
+Thermometer by Anggara Putra from [Noun Project](https://thenounproject.com/browse/icons/term/thermometer/) (CC BY 3.0)
