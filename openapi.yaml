@@ -1,0 +1,180 @@
+openapi: 3.1.0
+info:
+  title: Temp Stick API
+  description: API access to the Ideal Sciences Temp Stick developer API
+  version: v1
+servers:
+  - url: https://tempstickapi.com/api/v1
+paths:
+  /sensor/{sensor_id}/readings:
+    get:
+      summary: Get sensor readings
+      parameters:
+        - name: sensor_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: setting
+          in: query
+          schema:
+            type: string
+        - name: start
+          in: query
+          schema:
+            type: string
+        - name: end
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /sensor/{sensor_id}:
+    get:
+      summary: Get sensor details
+      parameters:
+        - name: sensor_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorResponse'
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        type:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/Data'
+    Data:
+      type: object
+      properties:
+        start:
+          type: string
+        end:
+          type: string
+        readings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reading'
+    Reading:
+      type: object
+      properties:
+        sensor_time:
+          type: string
+        temperature:
+          type: number
+        humidity:
+          type: number
+        offline:
+          type: integer
+    SensorResponse:
+      type: object
+      properties:
+        type:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/SensorData'
+    SensorData:
+      type: object
+      properties:
+        version:
+          type: string
+        sensor_id:
+          type: string
+        sensor_name:
+          type: string
+        sensor_mac_addr:
+          type: string
+        owner_id:
+          type: string
+        type:
+          type: string
+        alert_interval:
+          type: string
+        send_interval:
+          type: string
+        last_temp:
+          type: integer
+        last_humidity:
+          type: number
+        last_voltage:
+          type: integer
+        battery_pct:
+          type: integer
+        wifi_connect_time:
+          type: integer
+        rssi:
+          type: integer
+        last_checkin:
+          type: string
+        next_checkin:
+          type: string
+        ssid:
+          type: string
+        offline:
+          type: string
+        alerts:
+          type: array
+          items:
+            type: string
+        use_sensor_settings:
+          type: integer
+        temp_offset:
+          type: string
+        humidity_offset:
+          type: string
+        alert_temp_below:
+          type: string
+        alert_temp_above:
+          type: string
+        alert_humidity_below:
+          type: string
+        alert_humidity_above:
+          type: string
+        connection_sensitivity:
+          type: string
+        use_alert_interval:
+          type: integer
+        use_offset:
+          type: string
+        last_messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+    Message:
+      type: object
+      properties:
+        temperature:
+          type: integer
+        humidity:
+          type: number
+        voltage:
+          type: string
+        RSSI:
+          type: string
+        time_to_connect:
+          type: string
+        sensor_time_utc:
+          type: string
