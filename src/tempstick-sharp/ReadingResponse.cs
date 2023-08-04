@@ -1,13 +1,13 @@
 ﻿namespace TempStick;
 public partial class ReadingResponse
 {
-    [JsonPropertyName("type"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("type")]
     public string Type { get; set; }
 
-    [JsonPropertyName("message"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("message")]
     public string Message { get; set; }
 
-    [JsonPropertyName("data"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("data")]
     public ReadingData Data { get; set; }
 
     private IDictionary<string, object> _additionalProperties;

@@ -2,13 +2,13 @@
 
 public partial class ReadingData
 {
-    [JsonPropertyName("start"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("start")]
     public string Start { get; set; }
 
-    [JsonPropertyName("end"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("end")]
     public string End { get; set; }
 
-    [JsonPropertyName("readings"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("readings")]
     public ICollection<Reading> Readings { get; set; }
 
     private IDictionary<string, object> _additionalProperties;

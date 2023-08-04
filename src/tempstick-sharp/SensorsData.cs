@@ -3,72 +3,72 @@
 public partial class SensorsData
 {
 
-    [JsonPropertyName("items"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("items")]
     public ICollection<SensorsDataItem> Sensors { get; set; }
 }
 
 public partial class SensorsDataItem
 {
-    [JsonPropertyName("version"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("version")]
     public string Version { get; set; }
 
-    [JsonPropertyName("sensor_id"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("sensor_id")]
     public string SensorId { get; set; }
 
-    [JsonPropertyName("sensor_name"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("sensor_name")]
     public string SensorName { get; set; }
 
-    [JsonPropertyName("sensor_mac_addr"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("sensor_mac_addr")]
     public string SensorMacAddress { get; set; }
 
-    [JsonPropertyName("owner_id"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("owner_id")]
     public string OwnerId { get; set; }
 
-    [JsonPropertyName("type"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("type")]
     public string Type { get; set; }
 
-    [JsonPropertyName("alert_interval"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("alert_interval")]
     public string AlertInterval { get; set; }
 
-    [JsonPropertyName("send_interval"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("send_interval")]
     public string SendInterval { get; set; }
 
-    [JsonPropertyName("last_temp"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("last_temp")]
     public double LastTemperature { get; set; }
 
-    [JsonPropertyName("last_humidity"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("last_humidity")]
     public double LastHumidity { get; set; }
 
-    [JsonPropertyName("last_voltage"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("last_voltage")]
     public string LastVoltage { get; set; }
 
-    [JsonPropertyName("battery_pct"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("battery_pct")]
     public double BatteryPercentage { get; set; }
 
-    [JsonPropertyName("wifi_connect_time"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("wifi_connect_time")]
     public string WifiConnectTime { get; set; }
 
-    [JsonPropertyName("rssi"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("rssi")]
     public string Rssi { get; set; }
 
-    [JsonPropertyName("last_checkin"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("last_checkin")]
     public string LastCheckin { get; set; }
 
-    [JsonPropertyName("next_checkin"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("next_checkin")]
     public string NextCheckin { get; set; }
 
-    [JsonPropertyName("ssid"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("ssid")]
     public string Ssid { get; set; }
 
-    [JsonPropertyName("offline"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("offline")]
     public string Offline { get; set; }
 
-    [JsonPropertyName("temp_offset"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("temp_offset")]
     public double TempOffset { get; set; }
 
-    [JsonPropertyName("humidity_offset"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("humidity_offset")]
     public double HumidityOffset { get; set; }
 
-    [JsonPropertyName("group"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("group")]
     public double Group { get; set; }
 }

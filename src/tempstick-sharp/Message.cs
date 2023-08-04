@@ -1,22 +1,22 @@
 ﻿namespace TempStick;
 public partial class Message
 {
-    [JsonPropertyName("temperature"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("temperature")]
     public double Temperature { get; set; }
 
-    [JsonPropertyName("humidity"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("humidity")]
     public double Humidity { get; set; }
 
-    [JsonPropertyName("voltage"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("voltage")]
     public string Voltage { get; set; }
 
-    [JsonPropertyName("RSSI"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("RSSI")]
     public string Rssi { get; set; }
 
-    [JsonPropertyName("time_to_connect"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("time_to_connect")]
     public string TimeToConnect { get; set; }
 
-    [JsonPropertyName("sensor_time_utc"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("sensor_time_utc")]
     public string SensorTimeUtc { get; set; }
 
     private IDictionary<string, object> _additionalProperties;

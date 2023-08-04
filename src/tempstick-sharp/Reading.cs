@@ -2,16 +2,16 @@
 
 public partial class Reading
 {
-    [JsonPropertyName("sensor_time"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("sensor_time")]
     public string SensorTime { get; set; }
 
-    [JsonPropertyName("temperature"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("temperature")]
     public double Temperature { get; set; }
 
-    [JsonPropertyName("humidity"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("humidity")]
     public double Humidity { get; set; }
 
-    [JsonPropertyName("offline"), JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonPropertyName("offline")]
     public int Offline { get; set; }
 
     private IDictionary<string, object> _additionalProperties;
