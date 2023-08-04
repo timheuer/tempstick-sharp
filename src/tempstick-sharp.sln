@@ -5,15 +5,15 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tempstick-sharp", "tempstick-sharp\tempstick-sharp.csproj", "{2A338807-840F-44DB-BBCB-DB5F43E77E13}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTests", "ApiTests\ApiTests.csproj", "{4ACF3274-988F-45B4-AC13-B08A3E686B69}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{28FB71CA-9B7B-442F-8125-ADD05B5771B5}"
 	ProjectSection(SolutionItems) = preProject
-		..\openapi.yaml = ..\openapi.yaml
 		..\.github\workflows\build.yaml = ..\.github\workflows\build.yaml
+		..\openapi.yaml = ..\openapi.yaml
 		..\README.md = ..\README.md
 		..\version.json = ..\version.json
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTests", "..\tests\ApiTests\ApiTests.csproj", "{F7E49FEF-6DED-4300-9415-9D2495B93730}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +25,10 @@ Global
 		{2A338807-840F-44DB-BBCB-DB5F43E77E13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A338807-840F-44DB-BBCB-DB5F43E77E13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A338807-840F-44DB-BBCB-DB5F43E77E13}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4ACF3274-988F-45B4-AC13-B08A3E686B69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4ACF3274-988F-45B4-AC13-B08A3E686B69}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4ACF3274-988F-45B4-AC13-B08A3E686B69}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4ACF3274-988F-45B4-AC13-B08A3E686B69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7E49FEF-6DED-4300-9415-9D2495B93730}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7E49FEF-6DED-4300-9415-9D2495B93730}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7E49FEF-6DED-4300-9415-9D2495B93730}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7E49FEF-6DED-4300-9415-9D2495B93730}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

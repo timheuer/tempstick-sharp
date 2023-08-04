@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\tempstick-sharp\tempstick-sharp.csproj" />
+    <ProjectReference Include="..\..\src\tempstick-sharp\tempstick-sharp.csproj" />
   </ItemGroup>
 
 </Project>

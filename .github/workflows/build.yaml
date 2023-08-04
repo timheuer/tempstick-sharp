@@ -27,7 +27,7 @@ jobs:
       DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION: true
       TERM: xterm
       PROJECT_PATH: "src/tempstick-sharp/tempstick-sharp.csproj"
-      TEST_PATH: "src/ApiTests/ApiTests.csproj"
+      TEST_PATH: "tests/ApiTests/ApiTests.csproj"
       API_KEY: ${{ secrets.TEMPSTICK_API_KEY }}
       SENSOR_ID: ${{ secrets.TEMPSTICK_SENSOR_ID }}
 
