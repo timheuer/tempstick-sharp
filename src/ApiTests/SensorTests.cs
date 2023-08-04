@@ -31,16 +31,23 @@ public class SensorTests
     }
 
     [TestMethod]
-    public async Task GetSensor()
+    public async Task Sensor_Has_Info()
     {
-        var sensor = await client.GetSensorAsync(SENSOR_ID);
+        var sensor = await client?.GetSensorAsync(SENSOR_ID);
         Assert.IsNotNull(sensor);
     }
 
     [TestMethod]
     public async Task Sensor_Has_Readings()
     {
-        var reading = await client.GetReadingsAsync(SENSOR_ID);
+        var reading = await client?.GetReadingsAsync(SENSOR_ID);
         Assert.IsTrue(reading.Type.ToLowerInvariant() == "success");
+    }
+
+    [TestMethod]
+    public async Task Can_Retrieve_Sensors()
+    {
+        var sensors = await client.GetSensorsAsync();
+        Assert.IsTrue(sensors.Type.ToLowerInvariant() == "success");
     }
 }
