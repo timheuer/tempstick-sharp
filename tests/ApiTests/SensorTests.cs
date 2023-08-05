@@ -24,11 +24,7 @@ public class SensorTests
         API_KEY = config["API_KEY"];
         SENSOR_ID = config["SENSOR_ID"];
 
-
-        HttpClient http = new HttpClient();
-        http.DefaultRequestHeaders.Add("X-API-KEY", API_KEY);
-
-        client = new TempStick.TempStickClient(http);
+        client = new TempStick.TempStickClient(API_KEY);
     }
 
     [TestMethod]
