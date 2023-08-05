@@ -3,6 +3,8 @@
 ![Nuget](https://img.shields.io/nuget/dt/TimHeuer.TempStickSharp?label=NuGet%20Downloads)
 
 
+![Logo](https://raw.githubusercontent.com/timheuer/tempstick-sharp/main/src/tempstick-sharp/art/icon.png)
+
 # TempStick#
 A simple C# client for the [TempStick](https://www.tempstick.com/) USB temperature sensor API.
 

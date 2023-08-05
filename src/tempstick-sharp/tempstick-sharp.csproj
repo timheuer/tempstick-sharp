@@ -16,7 +16,7 @@
     <PackageId>TimHeuer.TempStickSharp</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <PackageReleaseNotes>Refactoring to better API naming, easier setup, and fixing serialization with consumers</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
