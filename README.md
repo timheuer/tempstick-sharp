@@ -1,7 +1,6 @@
 [![Build](https://github.com/timheuer/tempstick-sharp/actions/workflows/build.yaml/badge.svg)](https://github.com/timheuer/tempstick-sharp/actions/workflows/build.yaml)
 [![GitHub last commit](https://img.shields.io/github/last-commit/timheuer/tempstick-sharp)](https://github.com/timheuer/tempstick-sharp/)
-![Nuget](https://img.shields.io/nuget/dt/TimHeuer.TempStickSharp?label=NuGet%20Downloads)
-
+[![Nuget](https://img.shields.io/nuget/dt/TimHeuer.TempStickSharp?label=NuGet%20Downloads)](https://www.nuget.org/packages/TimHeuer.TempStickSharp)
 
 ![Logo](https://raw.githubusercontent.com/timheuer/tempstick-sharp/main/src/tempstick-sharp/art/icon.png)
 
