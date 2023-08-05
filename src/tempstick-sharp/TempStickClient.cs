@@ -1,20 +1,8 @@
-#pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
-#pragma warning disable 114 // Disable "CS0114 '{derivedDto}.RaisePropertyChanged(String)' hides inherited member 'dtoBase.RaisePropertyChanged(String)'. To make the current member override that implementation, add the override keyword. Otherwise add the new keyword."
-#pragma warning disable 472 // Disable "CS0472 The result of the expression is always 'false' since a value of type 'Int32' is never equal to 'null' of type 'Int32?'
-#pragma warning disable 612 // Disable "CS0612 '...' is obsolete"
-#pragma warning disable 1573 // Disable "CS1573 Parameter '...' has no matching param tag in the XML comment for ...
-#pragma warning disable 1591 // Disable "CS1591 Missing XML comment for publicly visible type or member ..."
-#pragma warning disable 8073 // Disable "CS8073 The result of the expression is always 'false' since a value of type 'T' is never equal to 'null' of type 'T?'"
-#pragma warning disable 3016 // Disable "CS3016 Arrays as attribute arguments is not CLS-compliant"
-#pragma warning disable 8603 // Disable "CS8603 Possible null reference return"
-
-
 namespace TempStick;
 
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System = System;
 
@@ -26,7 +14,23 @@ public partial class TempStickClient
 
     public TempStickClient(HttpClient httpClient)
     {
+        if (httpClient == null)
+            throw new ArgumentNullException(nameof(httpClient));
+
+        if (!httpClient.DefaultRequestHeaders.Contains("X-API-KEY"))
+            throw new ArgumentNullException("An API key in the X-API-KEY default request headers was not found in the HttpClient.");
+
         _httpClient = httpClient;
+        _options = new Lazy<JsonSerializerOptions>(CreateSerializerSettings);
+    }
+
+    public TempStickClient(string apiKey)
+    {
+        if (string.IsNullOrWhiteSpace(apiKey))
+            throw new ArgumentNullException(nameof(apiKey));
+
+        _httpClient = new HttpClient();
+        _httpClient.DefaultRequestHeaders.Add("X-API-KEY", apiKey);
         _options = new Lazy<JsonSerializerOptions>(CreateSerializerSettings);
     }
 
@@ -427,13 +431,3 @@ public partial class TempStickClient
         return result == null ? "" : result;
     }
 }
-
-#pragma warning restore  108
-#pragma warning restore  114
-#pragma warning restore  472
-#pragma warning restore  612
-#pragma warning restore 1573
-#pragma warning restore 1591
-#pragma warning restore 8073
-#pragma warning restore 3016
-#pragma warning restore 8603

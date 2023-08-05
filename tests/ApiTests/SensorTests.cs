@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TempStick;
 
 namespace ApiTests;
 
@@ -26,7 +27,7 @@ public class SensorTests
 
         HttpClient http = new HttpClient();
         http.DefaultRequestHeaders.Add("X-API-KEY", API_KEY);
-        
+
         client = new TempStick.TempStickClient(http);
     }
 
@@ -49,5 +50,33 @@ public class SensorTests
     {
         var sensors = await client.GetSensorsAsync();
         Assert.IsTrue(sensors.Type.ToLowerInvariant() == "success");
+    }
+
+    [TestMethod]
+    public async Task Sensor_Has_Name()
+    {
+        var sensors = await client.GetSensorsAsync();
+        var sensor = await client.GetSensorAsync(sensors.Data.Sensors.FirstOrDefault().SensorId);
+        Console.WriteLine($"Sensor ID: {sensor.Data.SensorId}");
+        Assert.IsNotNull(sensor.Data.SensorName);
+    }
+
+    [TestMethod]
+    public async Task Api_Key_Required_Key_ctor()
+    {
+        Assert.ThrowsException<ArgumentNullException>(() =>
+        {
+            var client2 = new TempStickClient("");
+        });
+    }
+
+    [TestMethod]
+    public async Task Api_Key_Required_HttpClient_ctor()
+    {
+        Assert.ThrowsException<ArgumentNullException>(() =>
+        {
+            var http2 = new HttpClient();
+            var client2 = new TempStickClient(http2);
+        });
     }
 }
