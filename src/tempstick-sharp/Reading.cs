@@ -1,9 +1,9 @@
 ﻿namespace TempStick;
 
-public partial class Reading
+public partial class Reading : BaseAdditionalData
 {
     [JsonPropertyName("sensor_time")]
-    public string SensorTime { get; set; }
+    public string? SensorTime { get; set; }
 
     [JsonPropertyName("temperature")]
     public double Temperature { get; set; }
@@ -13,14 +13,5 @@ public partial class Reading
 
     [JsonPropertyName("offline")]
     public int Offline { get; set; }
-
-    private IDictionary<string, object> _additionalProperties;
-
-    [JsonExtensionData]
-    public IDictionary<string, object> AdditionalProperties
-    {
-        get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
-        set { _additionalProperties = value; }
-    }
 
 }

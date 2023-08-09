@@ -4,34 +4,34 @@ public partial class SensorsData
 {
 
     [JsonPropertyName("items")]
-    public ICollection<SensorsDataItem> Sensors { get; set; }
+    public ICollection<SensorsDataItem>? Sensors { get; set; }
 }
 
 public partial class SensorsDataItem
 {
     [JsonPropertyName("version")]
-    public string Version { get; set; }
+    public string? Version { get; set; }
 
     [JsonPropertyName("sensor_id")]
-    public string SensorId { get; set; }
+    public string? SensorId { get; set; }
 
     [JsonPropertyName("sensor_name")]
-    public string SensorName { get; set; }
+    public string? SensorName { get; set; }
 
     [JsonPropertyName("sensor_mac_addr")]
-    public string SensorMacAddress { get; set; }
+    public string? SensorMacAddress { get; set; }
 
     [JsonPropertyName("owner_id")]
-    public string OwnerId { get; set; }
+    public string? OwnerId { get; set; }
 
     [JsonPropertyName("type")]
-    public string Type { get; set; }
+    public string? Type { get; set; }
 
     [JsonPropertyName("alert_interval")]
-    public string AlertInterval { get; set; }
+    public string? AlertInterval { get; set; }
 
     [JsonPropertyName("send_interval")]
-    public string SendInterval { get; set; }
+    public string? SendInterval { get; set; }
 
     [JsonPropertyName("last_temp")]
     public double LastTemperature { get; set; }
@@ -40,28 +40,28 @@ public partial class SensorsDataItem
     public double LastHumidity { get; set; }
 
     [JsonPropertyName("last_voltage")]
-    public string LastVoltage { get; set; }
+    public string? LastVoltage { get; set; }
 
     [JsonPropertyName("battery_pct")]
     public double BatteryPercentage { get; set; }
 
     [JsonPropertyName("wifi_connect_time")]
-    public string WifiConnectTime { get; set; }
+    public string? WifiConnectTime { get; set; }
 
     [JsonPropertyName("rssi")]
-    public string Rssi { get; set; }
+    public string? Rssi { get; set; }
 
     [JsonPropertyName("last_checkin")]
-    public string LastCheckin { get; set; }
+    public string? LastCheckin { get; set; }
 
     [JsonPropertyName("next_checkin")]
-    public string NextCheckin { get; set; }
+    public string? NextCheckin { get; set; }
 
     [JsonPropertyName("ssid")]
-    public string Ssid { get; set; }
+    public string? Ssid { get; set; }
 
     [JsonPropertyName("offline")]
-    public string Offline { get; set; }
+    public string? Offline { get; set; }
 
     [JsonPropertyName("temp_offset")]
     public double TempOffset { get; set; }

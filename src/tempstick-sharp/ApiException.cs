@@ -11,7 +11,7 @@ public partial class ApiException : Exception
         : base(message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null) ? "(null)" : response.Substring(0, response.Length >= 512 ? 512 : response.Length)), innerException)
     {
         StatusCode = statusCode;
-        Response = response;
+        Response = response!;
         Headers = headers;
     }
 
