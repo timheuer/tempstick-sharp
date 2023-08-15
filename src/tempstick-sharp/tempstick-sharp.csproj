@@ -16,7 +16,7 @@
     <PackageId>TimHeuer.TempStickSharp</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>Refactoring to better API naming, easier setup, and fixing serialization with consumers</PackageReleaseNotes>
+    <PackageReleaseNotes>GetSensor now offsets checkin dates using sensor date provided in data payload</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

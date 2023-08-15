@@ -306,6 +306,16 @@ public partial class TempStickClient
                         {
                             throw new ApiException("ReadingResponse was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                         }
+
+                        // modify the last/next checkin with offset from sensor UTC
+                        if (objectResponse_.Object.Data.LastMessages.Count > 0)
+                        {
+                            var lci = ConvertToOffset(objectResponse_.Object.Data?.LastCheckin, objectResponse_.Object.Data.LastMessages.FirstOrDefault().SensorTimeUtc);
+                            var nci = ConvertToOffset(objectResponse_.Object.Data?.NextCheckin, objectResponse_.Object.Data.LastMessages.FirstOrDefault().SensorTimeUtc);
+                            objectResponse_.Object.Data.LastCheckin = lci;
+                            objectResponse_.Object.Data.NextCheckin = nci;
+                        }
+
                         return objectResponse_.Object;
                     }
                     else
@@ -326,6 +336,22 @@ public partial class TempStickClient
             if (disposeClient_)
                 client_.Dispose();
         }
+    }
+
+    internal string ConvertToOffset(string unadjustedDate, string utcSensorDate)
+    {
+        // Parse the date strings to DateTime
+        DateTime date1 = DateTime.ParseExact(unadjustedDate.Replace("Z",""), "yyyy-MM-dd HH:mm:ssK", null);
+        DateTime date2 = DateTime.ParseExact(utcSensorDate.Replace("Z",""), "yyyy-MM-dd HH:mm:ss", null, System.Globalization.DateTimeStyles.AssumeUniversal);
+
+        // Get the offset from date2's time zone
+        TimeSpan offset = date2 - date2.ToUniversalTime();
+
+        // Adjust date1 using the offset from date2
+        DateTime adjustedDate1 = date1 + offset;
+
+        // Convert back to string in the desired format
+        return adjustedDate1.ToString("yyyy-MM-dd HH:mm:ssK");
     }
 
     protected struct ObjectResponseResult<T>
