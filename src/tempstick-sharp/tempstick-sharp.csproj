@@ -16,7 +16,7 @@
     <PackageId>TimHeuer.TempStickSharp</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>GetSensor now offsets checkin dates using sensor date provided in data payload</PackageReleaseNotes>
+    <PackageReleaseNotes>Revert sensor adjustment on time.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
