@@ -1,4 +1,6 @@
-﻿namespace TempStick;
+﻿using TempStickSharp.Helpers;
+
+namespace TempStick;
 
 public partial class SensorData : BaseAdditionalData
 {
@@ -54,13 +56,15 @@ public partial class SensorData : BaseAdditionalData
     public string? Ssid { get; set; }
 
     [JsonPropertyName("offline")]
-    public string? Offline { get; set; }
+    [JsonConverter(typeof(BooleanConverter))]
+    public bool Offline { get; set; }
 
     [JsonPropertyName("alerts")]
     public ICollection<string>? Alerts { get; set; }
 
     [JsonPropertyName("use_sensor_settings")]
-    public int UseSensorSettings { get; set; }
+    [JsonConverter(typeof(BooleanConverter))]
+    public bool UseSensorSettings { get; set; }
 
     [JsonPropertyName("temp_offset")]
     public double TempOffset { get; set; }
@@ -84,10 +88,12 @@ public partial class SensorData : BaseAdditionalData
     public double ConnectionSensitivity { get; set; }
 
     [JsonPropertyName("use_alert_interval")]
-    public int UseAlertInterval { get; set; }
+    [JsonConverter(typeof(BooleanConverter))]
+    public bool UseAlertInterval { get; set; }
 
     [JsonPropertyName("use_offset")]
-    public int UseOffset { get; set; }
+    [JsonConverter(typeof(BooleanConverter))]
+    public bool UseOffset { get; set; }
 
     [JsonPropertyName("last_messages")]
     public ICollection<Message>? LastMessages { get; set; }

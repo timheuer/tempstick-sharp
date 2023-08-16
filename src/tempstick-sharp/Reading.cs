@@ -1,4 +1,6 @@
-﻿namespace TempStick;
+﻿using TempStickSharp.Helpers;
+
+namespace TempStick;
 
 public partial class Reading : BaseAdditionalData
 {
@@ -12,6 +14,7 @@ public partial class Reading : BaseAdditionalData
     public double Humidity { get; set; }
 
     [JsonPropertyName("offline")]
-    public int Offline { get; set; }
+    [JsonConverter(typeof(BooleanConverter))]
+    public bool Offline { get; set; }
 
 }

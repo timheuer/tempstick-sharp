@@ -48,6 +48,7 @@ public class SensorTests
     public async Task Sensor_Has_Readings()
     {
         var reading = await client?.GetReadingsAsync(SENSOR_ID);
+
         Assert.IsTrue(reading.Type.ToLowerInvariant() == "success");
     }
 
