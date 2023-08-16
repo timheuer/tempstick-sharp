@@ -81,7 +81,7 @@ jobs:
     needs: build
     environment:
       name: production
-      url: https://www.nuget.org/packages/TimHeuer.TempStickSharp
+      url: https://www.nuget.org/packages/TempStickSharp
     name: Sign and publish
     runs-on: ubuntu-latest 
     permissions:

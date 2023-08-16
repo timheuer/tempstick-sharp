@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>tempstick_sharp</RootNamespace>
+    <RootNamespace>TempStickSharp</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>TempStick#</Title>
@@ -13,10 +13,11 @@
     <RepositoryUrl>https://github.com/timheuer/tempstick-sharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageId>TimHeuer.TempStickSharp</PackageId>
+    <PackageId>TempStickSharp</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReleaseNotes>Revert sensor adjustment on time.</PackageReleaseNotes>
+    <Authors>Tim Heuer</Authors>
   </PropertyGroup>
 
   <ItemGroup>
