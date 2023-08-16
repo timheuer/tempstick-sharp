@@ -1,4 +1,4 @@
-﻿namespace TempStickSharp;
+﻿namespace TempStick;
 public class UserResponse : BaseResponseMetadata
 {
     [JsonPropertyName("data")]

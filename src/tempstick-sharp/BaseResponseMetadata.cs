@@ -1,4 +1,4 @@
-﻿using TempStick;
+﻿namespace TempStick;
 
 public partial class BaseResponseMetadata : BaseAdditionalData
 {

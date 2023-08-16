@@ -1,6 +1,4 @@
-﻿using TempStickSharp.Helpers;
-
-namespace TempStick;
+﻿namespace TempStick;
 
 public partial class SensorData : BaseAdditionalData
 {

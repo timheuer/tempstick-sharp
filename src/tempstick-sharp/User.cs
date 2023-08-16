@@ -1,11 +1,9 @@
-﻿using TempStickSharp.Helpers;
-
-namespace TempStickSharp;
+﻿namespace TempStick;
 public class User
 {
     [JsonPropertyName("id")]
     public required string Id { get; set; }
-    
+
     [JsonPropertyName("email")]
     public string? Email { get; set; }
 
@@ -52,7 +50,7 @@ public class User
 
     [JsonPropertyName("chart_fill")]
     [JsonConverter(typeof(BooleanConverter))]
-    public bool ChartFill {  get; set; }
+    public bool ChartFill { get; set; }
 
     [JsonPropertyName("send_reports")]
     [JsonConverter(typeof(BooleanConverter))]

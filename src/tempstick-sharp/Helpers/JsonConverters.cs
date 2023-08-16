@@ -1,4 +1,4 @@
-﻿namespace TempStickSharp.Helpers;
+﻿namespace TempStick;
 
 public class BooleanConverter : JsonConverter<bool>
 {
