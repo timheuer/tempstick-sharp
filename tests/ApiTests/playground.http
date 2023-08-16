@@ -1,0 +1,3 @@
+
+GET https://tempstickapi.com/api/v1/user
+X-API-KEY: {{ApiKey}}
