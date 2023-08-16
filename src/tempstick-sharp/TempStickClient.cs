@@ -27,7 +27,7 @@ public partial class TempStickClient
     public TempStickClient(string apiKey)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
-            throw new ArgumentNullException(nameof(apiKey));
+            throw new ArgumentNullException("apiKey","An API key was not provided and is required. Get this from your MyTempStick Dashboard account.");
 
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Add("X-API-KEY", apiKey);

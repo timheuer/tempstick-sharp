@@ -35,6 +35,16 @@ public class SensorTests
     }
 
     [TestMethod]
+    public async Task Api_Key_Required()
+    {
+        Assert.ThrowsException<ArgumentNullException>(() =>
+        {
+            var client = new TempStickClient("");
+        });
+
+    }
+
+    [TestMethod]
     public async Task Sensor_Has_Readings()
     {
         var reading = await client?.GetReadingsAsync(SENSOR_ID);
