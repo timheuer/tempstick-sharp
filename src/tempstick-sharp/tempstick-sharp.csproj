@@ -16,7 +16,7 @@
     <PackageId>TempStickSharp</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>Revert sensor adjustment on time.</PackageReleaseNotes>
+    <PackageReleaseNotes>BREAKING CHANGES -- moved some types to true booleans. Implemented GetCurrentUser. </PackageReleaseNotes>
     <Authors>Tim Heuer</Authors>
   </PropertyGroup>
 
