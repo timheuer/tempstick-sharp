@@ -4,10 +4,9 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
-using TempStickSharp;
 using System = System;
 
-public partial class TempStickClient 
+public partial class TempStickClient
 {
     private string _baseUrl = "https://tempstickapi.com/api/v1";
     private HttpClient _httpClient;
@@ -28,7 +27,7 @@ public partial class TempStickClient
     public TempStickClient(string apiKey)
     {
         if (string.IsNullOrWhiteSpace(apiKey))
-            throw new ArgumentNullException("apiKey","An API key was not provided and is required. Get this from your MyTempStick Dashboard account.");
+            throw new ArgumentNullException("apiKey", "An API key was not provided and is required. Get this from your MyTempStick Dashboard account.");
 
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Add("X-API-KEY", apiKey);
@@ -472,7 +471,7 @@ public partial class TempStickClient
                 var field = System.Reflection.IntrospectionExtensions.GetTypeInfo(value.GetType()).GetDeclaredField(name);
                 if (field != null)
                 {
-                    var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute)) 
+                    var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute))
                         as System.Runtime.Serialization.EnumMemberAttribute;
                     if (attribute != null)
                     {
@@ -484,17 +483,17 @@ public partial class TempStickClient
                 return converted == null ? string.Empty : converted;
             }
         }
-        else if (value is bool) 
+        else if (value is bool)
         {
             return Convert.ToString((bool)value, cultureInfo).ToLowerInvariant();
         }
         else if (value is byte[])
         {
-            return Convert.ToBase64String((byte[]) value);
+            return Convert.ToBase64String((byte[])value);
         }
         else if (value.GetType().IsArray)
         {
-            var array = Enumerable.OfType<object>((Array) value);
+            var array = Enumerable.OfType<object>((Array)value);
             return string.Join(",", Enumerable.Select(array, o => ConvertToString(o, cultureInfo)));
         }
 
