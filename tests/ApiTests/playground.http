@@ -1,3 +1,14 @@
+@baseuri=https://tempstickapi.com/api/v1
 
-GET https://tempstickapi.com/api/v1/user
+GET {{baseuri}}/user
+X-API-KEY: {{ApiKey}}
+
+###
+
+GET {{baseuri}}/sensor/{{SensorId}}
+X-API-KEY: {{ApiKey}}
+
+###
+
+GET {{baseuri}}/sensor/{{SensorId}}/readings
 X-API-KEY: {{ApiKey}}

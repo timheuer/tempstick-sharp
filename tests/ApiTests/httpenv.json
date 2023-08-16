@@ -1,9 +1,12 @@
 {
   "dev": {
-    "MY_VALUE": "Hello world",
     "ApiKey": {
       "provider": "AspnetUserSecrets",
       "secretName": "API_KEY"
+    },
+    "SensorId": {
+      "provider": "AspnetUserSecrets",
+      "secretName": "SENSOR_ID"
     }
   }
 }
