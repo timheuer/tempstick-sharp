@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Text.Json;
 using TempStick;
 
 namespace ApiTests;
@@ -38,7 +39,18 @@ public class UserTests
     [TestMethod]
     public async Task DayOfWeek_Correct()
     {
-        var user = await client?.GetCurrentUserAsync();
-        Assert.AreEqual(DayOfWeek.Tuesday, user.User.WeeklyReportDay);
+        var jsonString = @"{""id"":""12345"",""weekly_report_day"":""3""}"; // 3 represents Tuesday for the API
+        var user = JsonSerializer.Deserialize<User>(jsonString);
+        Assert.AreEqual(DayOfWeek.Tuesday, user.WeeklyReportDay);
+    }
+
+    [TestMethod]
+    public async Task Boolean_Converter_String_or_Int()
+    {
+        var jsonString = @"{""id"":""12345"",""chart_fill"":""1"",""use_local_timezone"":0}"; // 3 represents Tuesday for the API
+        var user = JsonSerializer.Deserialize<User>(jsonString);
+
+        Assert.IsFalse(user.UseLocalTimeZone);
+        Assert.IsTrue(user.ChartFill);
     }
 }

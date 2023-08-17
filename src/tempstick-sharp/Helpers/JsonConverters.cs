@@ -9,7 +9,6 @@ public class BooleanConverter : JsonConverter<bool>
             return string.Equals(reader.GetString(), "1", StringComparison.OrdinalIgnoreCase);
         }
         return reader.TryGetInt32(out var value) && value == 1;
-
     }
 
     public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
@@ -24,13 +23,15 @@ public class DayOfWeekConverter : JsonConverter<DayOfWeek>
     public override DayOfWeek Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var valueAsString = reader.GetString();
-        DayOfWeek day = (DayOfWeek)(Convert.ToInt32(valueAsString) - 1);
-        return day;
+        if (int.TryParse(valueAsString, out int value))
+        {
+            return (DayOfWeek)(value - 1);
+        }
+        throw new JsonException($"Invalid value '{valueAsString}' for {nameof(DayOfWeek)}.");
     }
 
     public override void Write(Utf8JsonWriter writer, DayOfWeek value, JsonSerializerOptions options)
     {
-        int newDay = ((int)value) + 1;
-        writer.WriteStringValue(newDay.ToString());
+        writer.WriteStringValue(((int)value + 1).ToString());
     }
 }
