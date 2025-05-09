@@ -2,9 +2,9 @@
 
 on:
   schedule:
-    - cron: '0 22 * * 5' # every Friday at 22:00
+    - cron: "0 22 * * 5" # every Friday at 22:00
   workflow_dispatch:
-      
+
 jobs:
   build:
     name: Run tests
@@ -23,14 +23,14 @@ jobs:
       SENSOR_ID: ${{ secrets.TEMPSTICK_SENSOR_ID }}
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
 
-    - name: 🧪 Run Tests
-      run: dotnet test ${{ env.TEST_PATH }} --configuration Release
+      - name: 🧪 Run Tests
+        run: dotnet test ${{ env.TEST_PATH }} --configuration Release
