@@ -9,18 +9,16 @@ using System = System;
 public partial class TempStickClient
 {
     private string _baseUrl = "https://tempstickapi.com/api/v1";
-    private HttpClient _httpClient;
-    private Lazy<JsonSerializerOptions> _options;
+    private readonly HttpClient _httpClient;
+    private readonly Lazy<JsonSerializerOptions> _options;
 
     public TempStickClient(HttpClient httpClient)
     {
-        if (httpClient == null)
-            throw new ArgumentNullException(nameof(httpClient));
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
-        if (!httpClient.DefaultRequestHeaders.Contains("X-API-KEY"))
+        if (!_httpClient.DefaultRequestHeaders.Contains("X-API-KEY"))
             throw new ArgumentNullException("An API key in the X-API-KEY default request headers was not found in the HttpClient.");
 
-        _httpClient = httpClient;
         _options = new Lazy<JsonSerializerOptions>(CreateSerializerSettings);
     }
 
@@ -95,83 +93,64 @@ public partial class TempStickClient
         if (sensor_id == null)
             throw new ArgumentNullException("sensor_id");
 
-        var urlBuilder_ = new System.Text.StringBuilder();
-        urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/sensor/{sensor_id}/readings?");
-        urlBuilder_.Replace("{sensor_id}", Uri.EscapeDataString(ConvertToString(sensor_id, System.Globalization.CultureInfo.InvariantCulture)));
+        var urlBuilder = new StringBuilder();
+        urlBuilder.Append(BaseUrl?.TrimEnd('/') ?? "").Append("/sensor/{sensor_id}/readings?");
+        urlBuilder.Replace("{sensor_id}", Uri.EscapeDataString(ConvertToString(sensor_id, System.Globalization.CultureInfo.InvariantCulture)));
         if (offset != null)
         {
-            urlBuilder_.Append(Uri.EscapeDataString("offset") + "=").Append(Uri.EscapeDataString(ConvertToString(offset, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            urlBuilder.Append(Uri.EscapeDataString("offset") + "=").Append(Uri.EscapeDataString(ConvertToString(offset, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
         }
         if (setting != null)
         {
-            urlBuilder_.Append(Uri.EscapeDataString("setting") + "=").Append(Uri.EscapeDataString(ConvertToString(setting, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            urlBuilder.Append(Uri.EscapeDataString("setting") + "=").Append(Uri.EscapeDataString(ConvertToString(setting, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
         }
         if (start != null)
         {
-            urlBuilder_.Append(Uri.EscapeDataString("start") + "=").Append(Uri.EscapeDataString(ConvertToString(start, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            urlBuilder.Append(Uri.EscapeDataString("start") + "=").Append(Uri.EscapeDataString(ConvertToString(start, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
         }
         if (end != null)
         {
-            urlBuilder_.Append(Uri.EscapeDataString("end") + "=").Append(Uri.EscapeDataString(ConvertToString(end, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            urlBuilder.Append(Uri.EscapeDataString("end") + "=").Append(Uri.EscapeDataString(ConvertToString(end, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
         }
-        urlBuilder_.Length--;
+        urlBuilder.Length--;
 
-        var client_ = _httpClient;
-        var disposeClient_ = false;
-        try
+        using (var request = new HttpRequestMessage())
         {
-            using (var request_ = new HttpRequestMessage())
+            request.Method = HttpMethod.Get;
+            request.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+            PrepareRequest(_httpClient, request, urlBuilder);
+
+            var url = urlBuilder.ToString();
+            request.RequestUri = new Uri(url, UriKind.RelativeOrAbsolute);
+
+            PrepareRequest(_httpClient, request, url);
+
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var headers = response.Headers.ToDictionary(h => h.Key, h => h.Value);
+            if (response.Content?.Headers != null)
             {
-                request_.Method = new HttpMethod("GET");
-                request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                PrepareRequest(client_, request_, urlBuilder_);
-
-                var url_ = urlBuilder_.ToString();
-                request_.RequestUri = new Uri(url_, UriKind.RelativeOrAbsolute);
-
-                PrepareRequest(client_, request_, url_);
-
-                var response_ = await client_.SendAsync(request_, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                var disposeResponse_ = true;
-                try
-                {
-                    var headers_ = Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
-                    if (response_.Content != null && response_.Content.Headers != null)
-                    {
-                        foreach (var item_ in response_.Content.Headers)
-                            headers_[item_.Key] = item_.Value;
-                    }
-
-                    ProcessResponse(client_, response_);
-
-                    var status_ = (int)response_.StatusCode;
-                    if (status_ == 200)
-                    {
-                        var objectResponse_ = await ReadObjectResponseAsync<ReadingResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                        if (objectResponse_.Object == null)
-                        {
-                            throw new ApiException("ReadingResponse was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                        }
-                        return objectResponse_.Object;
-                    }
-                    else
-                    {
-                        var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                    }
-                }
-                finally
-                {
-                    if (disposeResponse_)
-                        response_.Dispose();
-                }
+                foreach (var item in response.Content.Headers)
+                    headers[item.Key] = item.Value;
             }
-        }
-        finally
-        {
-            if (disposeClient_)
-                client_.Dispose();
+
+            ProcessResponse(_httpClient, response);
+
+            var status = (int)response.StatusCode;
+            if (status == 200)
+            {
+                var objectResponse = await ReadObjectResponseAsync<ReadingResponse>(response, headers, cancellationToken).ConfigureAwait(false);
+                if (objectResponse.Object == null)
+                {
+                    throw new ApiException("ReadingResponse was null which was not expected.", status, objectResponse.Text, headers, null);
+                }
+                return objectResponse.Object;
+            }
+            else
+            {
+                var responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                throw new ApiException("The HTTP status code of the response was not expected (" + status + ").", status, responseData, headers, null);
+            }
         }
     }
 
@@ -182,65 +161,46 @@ public partial class TempStickClient
 
     public virtual async Task<UserResponse> GetCurrentUserAsync(CancellationToken cancellationToken)
     {
-        var urlBuilder_ = new System.Text.StringBuilder();
-        urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user");
+        var urlBuilder = new StringBuilder();
+        urlBuilder.Append(BaseUrl?.TrimEnd('/') ?? "").Append("/user");
 
-        var client_ = _httpClient;
-        var disposeClient_ = false;
-        try
+        using (var request = new HttpRequestMessage())
         {
-            using (var request_ = new HttpRequestMessage())
+            request.Method = HttpMethod.Get;
+            request.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+            PrepareRequest(_httpClient, request, urlBuilder);
+
+            var url = urlBuilder.ToString();
+            request.RequestUri = new Uri(url, UriKind.RelativeOrAbsolute);
+
+            PrepareRequest(_httpClient, request, url);
+
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var headers = response.Headers.ToDictionary(h => h.Key, h => h.Value);
+            if (response.Content?.Headers != null)
             {
-                request_.Method = new HttpMethod("GET");
-                request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                PrepareRequest(client_, request_, urlBuilder_);
-
-                var url_ = urlBuilder_.ToString();
-                request_.RequestUri = new Uri(url_, UriKind.RelativeOrAbsolute);
-
-                PrepareRequest(client_, request_, url_);
-
-                var response_ = await client_.SendAsync(request_, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                var disposeResponse_ = true;
-                try
-                {
-                    var headers_ = Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
-                    if (response_.Content != null && response_.Content.Headers != null)
-                    {
-                        foreach (var item_ in response_.Content.Headers)
-                            headers_[item_.Key] = item_.Value;
-                    }
-
-                    ProcessResponse(client_, response_);
-
-                    var status_ = (int)response_.StatusCode;
-                    if (status_ == 200)
-                    {
-                        var objectResponse_ = await ReadObjectResponseAsync<UserResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                        if (objectResponse_.Object == null)
-                        {
-                            throw new ApiException("ReadingResponse was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                        }
-                        return objectResponse_.Object;
-                    }
-                    else
-                    {
-                        var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                    }
-                }
-                finally
-                {
-                    if (disposeResponse_)
-                        response_.Dispose();
-                }
+                foreach (var item in response.Content.Headers)
+                    headers[item.Key] = item.Value;
             }
-        }
-        finally
-        {
-            if (disposeClient_)
-                client_.Dispose();
+
+            ProcessResponse(_httpClient, response);
+
+            var status = (int)response.StatusCode;
+            if (status == 200)
+            {
+                var objectResponse = await ReadObjectResponseAsync<UserResponse>(response, headers, cancellationToken).ConfigureAwait(false);
+                if (objectResponse.Object == null)
+                {
+                    throw new ApiException("UserResponse was null which was not expected.", status, objectResponse.Text, headers, null);
+                }
+                return objectResponse.Object;
+            }
+            else
+            {
+                var responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                throw new ApiException("The HTTP status code of the response was not expected (" + status + ").", status, responseData, headers, null);
+            }
         }
     }
 
@@ -251,65 +211,46 @@ public partial class TempStickClient
 
     public virtual async Task<SensorsResponse> GetSensorsAsync(CancellationToken cancellationToken)
     {
-        var urlBuilder_ = new System.Text.StringBuilder();
-        urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/sensors/all");
+        var urlBuilder = new StringBuilder();
+        urlBuilder.Append(BaseUrl?.TrimEnd('/') ?? "").Append("/sensors/all");
 
-        var client_ = _httpClient;
-        var disposeClient_ = false;
-        try
+        using (var request = new HttpRequestMessage())
         {
-            using (var request_ = new HttpRequestMessage())
+            request.Method = HttpMethod.Get;
+            request.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+            PrepareRequest(_httpClient, request, urlBuilder);
+
+            var url = urlBuilder.ToString();
+            request.RequestUri = new Uri(url, UriKind.RelativeOrAbsolute);
+
+            PrepareRequest(_httpClient, request, url);
+
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var headers = response.Headers.ToDictionary(h => h.Key, h => h.Value);
+            if (response.Content?.Headers != null)
             {
-                request_.Method = new HttpMethod("GET");
-                request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                PrepareRequest(client_, request_, urlBuilder_);
-
-                var url_ = urlBuilder_.ToString();
-                request_.RequestUri = new Uri(url_, UriKind.RelativeOrAbsolute);
-
-                PrepareRequest(client_, request_, url_);
-
-                var response_ = await client_.SendAsync(request_, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                var disposeResponse_ = true;
-                try
-                {
-                    var headers_ = Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
-                    if (response_.Content != null && response_.Content.Headers != null)
-                    {
-                        foreach (var item_ in response_.Content.Headers)
-                            headers_[item_.Key] = item_.Value;
-                    }
-
-                    ProcessResponse(client_, response_);
-
-                    var status_ = (int)response_.StatusCode;
-                    if (status_ == 200)
-                    {
-                        var objectResponse_ = await ReadObjectResponseAsync<SensorsResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                        if (objectResponse_.Object == null)
-                        {
-                            throw new ApiException("ReadingResponse was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                        }
-                        return objectResponse_.Object;
-                    }
-                    else
-                    {
-                        var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                    }
-                }
-                finally
-                {
-                    if (disposeResponse_)
-                        response_.Dispose();
-                }
+                foreach (var item in response.Content.Headers)
+                    headers[item.Key] = item.Value;
             }
-        }
-        finally
-        {
-            if (disposeClient_)
-                client_.Dispose();
+
+            ProcessResponse(_httpClient, response);
+
+            var status = (int)response.StatusCode;
+            if (status == 200)
+            {
+                var objectResponse = await ReadObjectResponseAsync<SensorsResponse>(response, headers, cancellationToken).ConfigureAwait(false);
+                if (objectResponse.Object == null)
+                {
+                    throw new ApiException("SensorsResponse was null which was not expected.", status, objectResponse.Text, headers, null);
+                }
+                return objectResponse.Object;
+            }
+            else
+            {
+                var responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                throw new ApiException("The HTTP status code of the response was not expected (" + status + ").", status, responseData, headers, null);
+            }
         }
     }
 
@@ -332,69 +273,49 @@ public partial class TempStickClient
     public virtual async Task<SensorResponse> GetSensorAsync(string sensor_id, CancellationToken cancellationToken)
     {
         if (sensor_id == null)
-            throw new ArgumentNullException("sensor_id");
+            throw new ArgumentNullException(nameof(sensor_id));
 
-        var urlBuilder_ = new System.Text.StringBuilder();
-        urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/sensor/{sensor_id}");
-        urlBuilder_.Replace("{sensor_id}", Uri.EscapeDataString(ConvertToString(sensor_id, System.Globalization.CultureInfo.InvariantCulture)));
+        var urlBuilder = new StringBuilder();
+        urlBuilder.Append(BaseUrl?.TrimEnd('/') ?? "").Append("/sensor/{sensor_id}");
+        urlBuilder.Replace("{sensor_id}", Uri.EscapeDataString(ConvertToString(sensor_id, System.Globalization.CultureInfo.InvariantCulture)));
 
-        var client_ = _httpClient;
-        var disposeClient_ = false;
-        try
+        using (var request = new HttpRequestMessage())
         {
-            using (var request_ = new HttpRequestMessage())
+            request.Method = HttpMethod.Get;
+            request.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+            PrepareRequest(_httpClient, request, urlBuilder);
+
+            var url = urlBuilder.ToString();
+            request.RequestUri = new Uri(url, UriKind.RelativeOrAbsolute);
+
+            PrepareRequest(_httpClient, request, url);
+
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            var headers = response.Headers.ToDictionary(h => h.Key, h => h.Value);
+            if (response.Content?.Headers != null)
             {
-                request_.Method = new HttpMethod("GET");
-                request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                PrepareRequest(client_, request_, urlBuilder_);
-
-                var url_ = urlBuilder_.ToString();
-                request_.RequestUri = new Uri(url_, UriKind.RelativeOrAbsolute);
-
-                PrepareRequest(client_, request_, url_);
-
-                var response_ = await client_.SendAsync(request_, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                var disposeResponse_ = true;
-                try
-                {
-                    var headers_ = Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
-                    if (response_.Content != null && response_.Content.Headers != null)
-                    {
-                        foreach (var item_ in response_.Content.Headers)
-                            headers_[item_.Key] = item_.Value;
-                    }
-
-                    ProcessResponse(client_, response_);
-
-                    var status_ = (int)response_.StatusCode;
-                    if (status_ == 200)
-                    {
-                        var objectResponse_ = await ReadObjectResponseAsync<SensorResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                        if (objectResponse_.Object == null)
-                        {
-                            throw new ApiException("ReadingResponse was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                        }
-
-                        return objectResponse_.Object;
-                    }
-                    else
-                    {
-                        var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                    }
-                }
-                finally
-                {
-                    if (disposeResponse_)
-                        response_.Dispose();
-                }
+                foreach (var item in response.Content.Headers)
+                    headers[item.Key] = item.Value;
             }
-        }
-        finally
-        {
-            if (disposeClient_)
-                client_.Dispose();
+
+            ProcessResponse(_httpClient, response);
+
+            var status = (int)response.StatusCode;
+            if (status == 200)
+            {
+                var objectResponse = await ReadObjectResponseAsync<SensorResponse>(response, headers, cancellationToken).ConfigureAwait(false);
+                if (objectResponse.Object == null)
+                {
+                    throw new ApiException("SensorResponse was null which was not expected.", status, objectResponse.Text, headers, null);
+                }
+                return objectResponse.Object;
+            }
+            else
+            {
+                var responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                throw new ApiException("The HTTP status code of the response was not expected (" + status + ").", status, responseData, headers, null);
+            }
         }
     }
 
@@ -402,8 +323,8 @@ public partial class TempStickClient
     {
         public ObjectResponseResult(T responseObject, string responseText)
         {
-            this.Object = responseObject;
-            this.Text = responseText;
+            Object = responseObject;
+            Text = responseText;
         }
 
         public T Object { get; }
@@ -417,7 +338,7 @@ public partial class TempStickClient
     {
         if (response == null || response.Content == null)
         {
-            return new ObjectResponseResult<T>(default(T), string.Empty);
+            return new ObjectResponseResult<T>(default, string.Empty);
         }
 
         if (ReadResponseAsString)

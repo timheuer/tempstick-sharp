@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="../.github/workflows/build.yaml" />
+    <File Path="../.github/workflows/test.yaml" />
+    <File Path="../.gitignore" />
+    <File Path="../openapi.yaml" />
+    <File Path="../README.md" />
+    <File Path="../version.json" />
+  </Folder>
+  <Project Path="../tests/ApiTests/ApiTests.csproj" />
+  <Project Path="tempstick-sharp/tempstick-sharp.csproj" />
+</Solution>
