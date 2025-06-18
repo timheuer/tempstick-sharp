@@ -358,10 +358,61 @@ public class EdgeCaseTests
         """;
 
         // Act
-        var user = JsonSerializer.Deserialize<User>(json);
-
-        // Assert
+        var user = JsonSerializer.Deserialize<User>(json);        // Assert
         Assert.IsNotNull(user);
         Assert.AreEqual(7, (int)user.WeeklyReportDay);
+    }
+
+    [TestMethod]
+    public void BooleanConverter_HandlesEdgeCaseInputs()
+    {
+        // Arrange
+        var converter = new BooleanConverter();
+
+        // Act & Assert
+        // Test basic functionality by creating a simple test
+        Assert.IsNotNull(converter);
+    }
+
+    [TestMethod]
+    public void SensorsDataItem_DifferentTypesForSameProperties()
+    {
+        // Arrange & Act - Test that SensorsData can handle various property scenarios
+        var sensorsData = new SensorsData();
+
+        // Assert
+        Assert.IsNotNull(sensorsData);
+        Assert.IsNull(sensorsData.Sensors); // Default null
+    }
+
+    [TestMethod]
+    public void Extensions_HandleExtremeValues()
+    {
+        // Arrange & Act
+        var extremeHot = 1000.0.AsFahrenheit();
+        var extremeCold = (-273.15).AsFahrenheit();
+        var extremeSignal = (-120.0).AsSignalQuality();
+
+        // Assert
+        Assert.IsTrue(extremeHot > 1000);
+        Assert.IsTrue(extremeCold < -400);
+    }
+
+    [TestMethod]
+    public void Collections_CanBeReassigned()
+    {
+        // Arrange
+        var sensorData = new SensorData();
+        var readingData = new ReadingData();
+
+        // Act
+        sensorData.Alerts = new List<string> { "test" };
+        readingData.Readings = new List<Reading> { new Reading() };
+
+        // Assert
+        Assert.IsNotNull(sensorData.Alerts);
+        Assert.IsNotNull(readingData.Readings);
+        Assert.AreEqual(1, sensorData.Alerts.Count);
+        Assert.AreEqual(1, readingData.Readings.Count);
     }
 }

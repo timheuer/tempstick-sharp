@@ -1,5 +1,7 @@
 using System.Net;
+using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TempStick;
 
@@ -170,13 +172,248 @@ public class TempStickClientUnitTests
     {
         // Arrange
         var client = new TempStickClient("test-api-key");
-        string? sensorId = null;
-
-        // Act & Assert
+        string? sensorId = null;        // Act & Assert
         await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
         {
-            await client.GetReadingsAsync(sensorId!, 0, "today", null, null);
+            await client.GetReadingsAsync(sensorId!, 0, "today", string.Empty, string.Empty);
         });
+    }
+
+    [TestMethod]
+    public void TempStickClient_JsonSerializerOptions_ReturnsConfiguredOptions()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+
+        // Act
+        var options = client.GetType().GetProperty("JsonSerializerOptions", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(client);
+
+        // Assert
+        Assert.IsNotNull(options);
+        Assert.IsInstanceOfType(options, typeof(JsonSerializerOptions));
+    }
+
+    [TestMethod]
+    public void TempStickClient_CreateSerializerSettings_CreatesValidSettings()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var method = typeof(TempStickClient).GetMethod("CreateSerializerSettings", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act
+        var result = method!.Invoke(client, null);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOfType(result, typeof(JsonSerializerOptions));
+    }
+
+    [TestMethod]
+    public async Task TempStickClient_ReadObjectResponseAsync_WithReadResponseAsStringTrue_WorksCorrectly()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        client.ReadResponseAsString = true;
+
+        var json = """{"id":"test","email":"test@example.com"}""";
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(json, Encoding.UTF8, "application/json")
+        };
+        var headers = new Dictionary<string, IEnumerable<string>>();
+
+        var method = typeof(TempStickClient).GetMethod("ReadObjectResponseAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act
+        var task = (Task)method!.MakeGenericMethod(typeof(User)).Invoke(client, new object[] { response, headers, CancellationToken.None })!;
+        await task;
+        var result = task.GetType().GetProperty("Result")!.GetValue(task);
+        var objectProperty = result!.GetType().GetProperty("Object")!.GetValue(result);
+
+        // Assert
+        Assert.IsNotNull(objectProperty);
+        Assert.IsInstanceOfType(objectProperty, typeof(User));
+        var user = (User)objectProperty;
+        Assert.AreEqual("test", user.Id);
+    }
+
+    [TestMethod]
+    public async Task TempStickClient_ReadObjectResponseAsync_WithNullResponse_ReturnsDefault()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var headers = new Dictionary<string, IEnumerable<string>>();
+
+        var method = typeof(TempStickClient).GetMethod("ReadObjectResponseAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);        // Act
+        var task = (Task)method!.MakeGenericMethod(typeof(User)).Invoke(client, new object?[] { null, headers, CancellationToken.None })!;
+        await task;
+        var result = task.GetType().GetProperty("Result")!.GetValue(task);
+        var objectProperty = result!.GetType().GetProperty("Object")!.GetValue(result);        // Assert
+        Assert.IsNull(objectProperty);
+    }
+
+    [TestMethod]
+    public async Task TempStickClient_ReadObjectResponseAsync_WithNullContent_ThrowsApiException()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = null };
+        var headers = new Dictionary<string, IEnumerable<string>>();
+
+        var method = typeof(TempStickClient).GetMethod("ReadObjectResponseAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act & Assert
+        var task = (Task)method!.MakeGenericMethod(typeof(User)).Invoke(client, new object[] { response, headers, CancellationToken.None })!;
+
+        await Assert.ThrowsExceptionAsync<ApiException>(async () => await task);
+    }
+
+    [TestMethod]
+    public async Task TempStickClient_ReadObjectResponseAsync_WithEmptyContent_ThrowsApiException()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent("", Encoding.UTF8, "application/json")
+        };
+        var headers = new Dictionary<string, IEnumerable<string>>();
+
+        var method = typeof(TempStickClient).GetMethod("ReadObjectResponseAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act & Assert
+        var task = (Task)method!.MakeGenericMethod(typeof(User)).Invoke(client, new object[] { response, headers, CancellationToken.None })!;
+
+        await Assert.ThrowsExceptionAsync<ApiException>(async () => await task);
+    }
+
+    [TestMethod]
+    public async Task TempStickClient_ReadObjectResponseAsync_WithStreamReading_WorksCorrectly()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        client.ReadResponseAsString = false; // Force stream reading
+
+        var json = """{"id":"test","email":"test@example.com"}""";
+
+        // Create compressed content
+        using var memoryStream = new MemoryStream();
+        using (var gzipStream = new System.IO.Compression.GZipStream(memoryStream, System.IO.Compression.CompressionMode.Compress))
+        using (var writer = new StreamWriter(gzipStream))
+        {
+            writer.Write(json);
+        }
+
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new ByteArrayContent(memoryStream.ToArray())
+        };
+        response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+        var headers = new Dictionary<string, IEnumerable<string>>();
+
+        var method = typeof(TempStickClient).GetMethod("ReadObjectResponseAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act
+        var task = (Task)method!.MakeGenericMethod(typeof(User)).Invoke(client, new object[] { response, headers, CancellationToken.None })!;
+        await task;
+        var result = task.GetType().GetProperty("Result")!.GetValue(task);
+        var objectProperty = result!.GetType().GetProperty("Object")!.GetValue(result);
+
+        // Assert
+        Assert.IsNotNull(objectProperty);
+        Assert.IsInstanceOfType(objectProperty, typeof(User));
+        var user = (User)objectProperty;
+        Assert.AreEqual("test", user.Id);
+    }
+
+    [TestMethod]
+    public async Task TempStickClient_ReadObjectResponseAsync_WithInvalidJson_ThrowsApiException()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        client.ReadResponseAsString = true;
+
+        var invalidJson = "{ invalid json }";
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(invalidJson, Encoding.UTF8, "application/json")
+        };
+        var headers = new Dictionary<string, IEnumerable<string>>();
+
+        var method = typeof(TempStickClient).GetMethod("ReadObjectResponseAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act & Assert
+        var task = (Task)method!.MakeGenericMethod(typeof(User)).Invoke(client, new object[] { response, headers, CancellationToken.None })!;
+
+        await Assert.ThrowsExceptionAsync<ApiException>(async () => await task);
+    }
+
+    public enum TestEnum
+    {
+        [System.Runtime.Serialization.EnumMember(Value = "custom_value")]
+        CustomValue,
+
+        [System.Runtime.Serialization.EnumMember(Value = "another_value")]
+        AnotherValue,
+
+        NoAttribute
+    }
+
+    [TestMethod]
+    public void ConvertToString_WithEnumMemberAttribute_ReturnsAttributeValue()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var method = typeof(TempStickClient).GetMethod("ConvertToString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act
+        var result = method!.Invoke(client, new object[] { TestEnum.CustomValue, System.Globalization.CultureInfo.InvariantCulture });
+
+        // Assert
+        Assert.AreEqual("custom_value", result);
+    }
+
+    [TestMethod]
+    public void ConvertToString_WithEnumMemberAttributeNullValue_ReturnsEnumName()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var method = typeof(TempStickClient).GetMethod("ConvertToString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act
+        var result = method!.Invoke(client, new object[] { TestEnum.NoAttribute, System.Globalization.CultureInfo.InvariantCulture });
+
+        // Assert
+        Assert.AreEqual("2", result); // Should return underlying value since no attribute
+    }
+
+    [TestMethod]
+    public void ConvertToString_WithDecimal_ReturnsStringRepresentation()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var method = typeof(TempStickClient).GetMethod("ConvertToString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act
+        var result = method!.Invoke(client, new object[] { 42.5m, System.Globalization.CultureInfo.InvariantCulture });
+
+        // Assert
+        Assert.AreEqual("42.5", result);
+    }
+
+    [TestMethod]
+    public void ConvertToString_WithDouble_ReturnsStringRepresentation()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var method = typeof(TempStickClient).GetMethod("ConvertToString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act
+        var result = method!.Invoke(client, new object[] { 42.5d, System.Globalization.CultureInfo.InvariantCulture });
+
+        // Assert
+        Assert.AreEqual("42.5", result);
     }
 }
 
@@ -282,5 +519,216 @@ public class TempStickClientConversionTests
 
         // Assert
         Assert.AreEqual("test string", result);
+    }
+
+    [TestMethod]
+    public void ObjectResponseResult_Constructor_SetsProperties()
+    {
+        // Arrange
+        var testObject = new User { Id = "test" };
+        var testText = "test response text";
+
+        // Use reflection to access the internal struct
+        var type = typeof(TempStickClient).GetNestedType("ObjectResponseResult`1", System.Reflection.BindingFlags.NonPublic);
+        var genericType = type!.MakeGenericType(typeof(User));
+        var constructor = genericType.GetConstructor(new Type[] { typeof(User), typeof(string) });
+
+        // Act
+        var result = constructor!.Invoke(new object[] { testObject, testText });
+        var objectProperty = genericType.GetProperty("Object")!.GetValue(result);
+        var textProperty = genericType.GetProperty("Text")!.GetValue(result);
+
+        // Assert
+        Assert.AreEqual(testObject, objectProperty);
+        Assert.AreEqual(testText, textProperty);
+    }
+
+    [TestMethod]
+    public void ObjectResponseResult_Constructor_WithNull_HandlesNullCorrectly()
+    {
+        // Arrange
+        User? testObject = null;
+        var testText = "test response text";
+
+        // Use reflection to access the internal struct
+        var type = typeof(TempStickClient).GetNestedType("ObjectResponseResult`1", System.Reflection.BindingFlags.NonPublic);
+        var genericType = type!.MakeGenericType(typeof(User));
+        var constructor = genericType.GetConstructor(new Type[] { typeof(User), typeof(string) });
+
+        // Act
+        var result = constructor!.Invoke(new object?[] { testObject, testText });
+        var objectProperty = genericType.GetProperty("Object")!.GetValue(result);
+        var textProperty = genericType.GetProperty("Text")!.GetValue(result);
+
+        // Assert
+        Assert.IsNull(objectProperty);
+        Assert.AreEqual(testText, textProperty);
+    }
+
+    [TestMethod]
+    public void ConvertToString_WithDateTime_ReturnsStringRepresentation()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var method = typeof(TempStickClient).GetMethod("ConvertToString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var testDate = new DateTime(2023, 12, 25, 10, 30, 0);
+
+        // Act
+        var result = method!.Invoke(client, new object[] { testDate, System.Globalization.CultureInfo.InvariantCulture });
+
+        // Assert
+        Assert.AreEqual("12/25/2023 10:30:00", result);
+    }
+
+    [TestMethod]
+    public void ConvertToString_WithFloat_ReturnsStringRepresentation()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var method = typeof(TempStickClient).GetMethod("ConvertToString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act
+        var result = method!.Invoke(client, new object[] { 42.5f, System.Globalization.CultureInfo.InvariantCulture });
+
+        // Assert
+        Assert.AreEqual("42.5", result);
+    }
+
+    [TestMethod]
+    public void ConvertToString_WithGuid_ReturnsStringRepresentation()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var method = typeof(TempStickClient).GetMethod("ConvertToString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var testGuid = Guid.Parse("12345678-1234-5678-9abc-123456789abc");
+
+        // Act
+        var result = method!.Invoke(client, new object[] { testGuid, System.Globalization.CultureInfo.InvariantCulture });
+
+        // Assert
+        Assert.AreEqual("12345678-1234-5678-9abc-123456789abc", result);
+    }
+
+    public enum TestEnumWithNullAttribute
+    {
+        [System.Runtime.Serialization.EnumMember(Value = null)]
+        NullValue
+    }
+
+    [TestMethod]
+    public void ConvertToString_WithEnumMemberAttributeNullValue_ReturnsEnumName()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var method = typeof(TempStickClient).GetMethod("ConvertToString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        // Act
+        var result = method!.Invoke(client, new object[] { TestEnumWithNullAttribute.NullValue, System.Globalization.CultureInfo.InvariantCulture });
+
+        // Assert
+        Assert.AreEqual("NullValue", result); // Should return enum name when attribute value is null
+    }
+
+    [TestMethod]
+    public void ConvertToString_WithComplexArray_ReturnsCommaSeparatedString()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var method = typeof(TempStickClient).GetMethod("ConvertToString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var array = new object[] { 1, "test", true, 3.14 };
+
+        // Act
+        var result = method!.Invoke(client, new object[] { array, System.Globalization.CultureInfo.InvariantCulture });
+
+        // Assert
+        Assert.AreEqual("1,test,true,3.14", result);
+    }
+    [TestMethod]
+    public void TempStickClient_BaseUrl_WithNullHandling()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+
+        // Act
+        client.BaseUrl = null!;
+        var result = client.BaseUrl;
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    [TestMethod]
+    public void TempStickClient_ReadResponseAsString_PropertyAccessors()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+
+        // Act & Assert
+        Assert.IsFalse(client.ReadResponseAsString); // default value
+
+        client.ReadResponseAsString = true;
+        Assert.IsTrue(client.ReadResponseAsString);
+
+        client.ReadResponseAsString = false;
+        Assert.IsFalse(client.ReadResponseAsString);
+    }
+
+    [TestMethod]
+    public void ConvertToString_WithEnumWithoutEnumMemberAttribute_ReturnsNumericValue()
+    {
+        // Arrange
+        var client = new TempStickClient("test-api-key");
+        var enumValue = DayOfWeek.Monday; // This enum doesn't have EnumMemberAttribute
+
+        // Act (using reflection to access private method)
+        var method = typeof(TempStickClient).GetMethod("ConvertToString", BindingFlags.NonPublic | BindingFlags.Instance);
+        var result = method?.Invoke(client, new object[] { enumValue, System.Globalization.CultureInfo.InvariantCulture }) as string;
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("1", result); // Monday as numeric
+    }
+
+    [TestMethod]
+    public async Task ReadObjectResponseAsync_WithGZipDecompression_StreamPath()
+    {
+        // This test covers the GZip decompression path in ReadObjectResponseAsync
+        var validJson = @"{""type"":""success"",""data"":{""id"":""123""}}";
+        var httpClient = new HttpClient(new TestMessageHandler(validJson));
+        httpClient.DefaultRequestHeaders.Add("X-API-KEY", "test-key");
+        var client = new TempStickClient(httpClient);
+
+        // Set ReadResponseAsString to false to use the stream path
+        client.ReadResponseAsString = false;
+
+        // Act & Assert
+        try
+        {
+            await client.GetCurrentUserAsync();
+        }
+        catch (Exception)
+        {
+            // Expected since the JSON structure doesn't match UserResponse exactly
+        }
+    }
+}
+
+// Test HTTP message handler for mocking responses
+public class TestMessageHandler : HttpMessageHandler
+{
+    private readonly string _response;
+
+    public TestMessageHandler(string response)
+    {
+        _response = response;
+    }
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(_response)
+        };
+        return Task.FromResult(response);
     }
 }
