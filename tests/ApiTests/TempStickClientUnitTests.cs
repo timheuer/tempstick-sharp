@@ -180,6 +180,58 @@ public class TempStickClientUnitTests
     }
 
     [TestMethod]
+    public async Task GetSensorAsync_ApiReturns404_ThrowsApiException()
+    {
+        // Arrange
+        var httpClient = new HttpClient(new TestMessageHandler("{}", HttpStatusCode.NotFound));
+        httpClient.DefaultRequestHeaders.Add("X-API-KEY", "test-key");
+        var client = new TempStickClient(httpClient);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsExceptionAsync<ApiException>(() => client.GetSensorAsync("123"));
+        Assert.AreEqual(404, ex.StatusCode);
+    }
+
+    [TestMethod]
+    public async Task GetCurrentUserAsync_ApiReturns404_ThrowsApiException()
+    {
+        // Arrange
+        var httpClient = new HttpClient(new TestMessageHandler("{}", HttpStatusCode.NotFound));
+        httpClient.DefaultRequestHeaders.Add("X-API-KEY", "test-key");
+        var client = new TempStickClient(httpClient);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsExceptionAsync<ApiException>(() => client.GetCurrentUserAsync());
+        Assert.AreEqual(404, ex.StatusCode);
+    }
+
+    [TestMethod]
+    public async Task GetSensorsAsync_ApiReturns404_ThrowsApiException()
+    {
+        // Arrange
+        var httpClient = new HttpClient(new TestMessageHandler("{}", HttpStatusCode.NotFound));
+        httpClient.DefaultRequestHeaders.Add("X-API-KEY", "test-key");
+        var client = new TempStickClient(httpClient);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsExceptionAsync<ApiException>(() => client.GetSensorsAsync());
+        Assert.AreEqual(404, ex.StatusCode);
+    }
+
+    [TestMethod]
+    public async Task GetReadingsAsync_ApiReturns404_ThrowsApiException()
+    {
+        // Arrange
+        var httpClient = new HttpClient(new TestMessageHandler("{}", HttpStatusCode.NotFound));
+        httpClient.DefaultRequestHeaders.Add("X-API-KEY", "test-key");
+        var client = new TempStickClient(httpClient);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsExceptionAsync<ApiException>(() => client.GetReadingsAsync("123"));
+        Assert.AreEqual(404, ex.StatusCode);
+    }
+
+    [TestMethod]
     public void TempStickClient_JsonSerializerOptions_ReturnsConfiguredOptions()
     {
         // Arrange
@@ -717,15 +769,17 @@ public class TempStickClientConversionTests
 public class TestMessageHandler : HttpMessageHandler
 {
     private readonly string _response;
+    private readonly HttpStatusCode _statusCode;
 
-    public TestMessageHandler(string response)
+    public TestMessageHandler(string response, HttpStatusCode statusCode = HttpStatusCode.OK)
     {
         _response = response;
+        _statusCode = statusCode;
     }
 
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        var response = new HttpResponseMessage(_statusCode)
         {
             Content = new StringContent(_response)
         };

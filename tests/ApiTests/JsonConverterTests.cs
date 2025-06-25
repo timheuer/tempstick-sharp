@@ -82,6 +82,19 @@ public class JsonConverterTests
         // Assert
         Assert.IsFalse(result!.UseLocalTimeZone);
     }
+
+    [TestMethod]
+    public void BooleanConverter_ReadString_OtherString_ReturnsFalse()
+    {
+        // Arrange - Use actual User class
+        var json = """{"id":"test","use_local_timezone":"other"}""";
+
+        // Act
+        var result = JsonSerializer.Deserialize<User>(json);
+
+        // Assert
+        Assert.IsFalse(result!.UseLocalTimeZone);
+    }
     [TestMethod]
     public void BooleanConverter_WriteTrue_ReturnsStringOne()
     {
