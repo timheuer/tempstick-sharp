@@ -1,0 +1,94 @@
+{
+  "id": "1769551161980-i9sn5wr",
+  "name": "TempStick",
+  "requests": [
+    {
+      "id": "1769551161980-rlbm5ec",
+      "name": "get_user",
+      "method": "GET",
+      "url": "{{baseuri}}/user",
+      "headers": [
+        {
+          "name": "X-API-KEY",
+          "value": "{{ApiKey}}",
+          "enabled": true
+        }
+      ],
+      "body": {
+        "type": "none",
+        "content": ""
+      },
+      "createdAt": 1769551161980,
+      "updatedAt": 1769551187118
+    },
+    {
+      "id": "1769551161981-08osycx",
+      "name": "get_sensor_info",
+      "method": "GET",
+      "url": "{{baseuri}}/sensor/{{SensorId}}",
+      "headers": [
+        {
+          "name": "X-API-KEY",
+          "value": "{{ApiKey}}",
+          "enabled": true
+        }
+      ],
+      "body": {
+        "type": "none",
+        "content": ""
+      },
+      "createdAt": 1769551161981,
+      "updatedAt": 1769551193755
+    },
+    {
+      "id": "1769551161981-r8962hu",
+      "name": "get_sensor_readings",
+      "method": "GET",
+      "url": "{{baseuri}}/sensor/{{SensorId}}/readings",
+      "headers": [
+        {
+          "name": "X-API-KEY",
+          "value": "{{ApiKey}}",
+          "enabled": true
+        }
+      ],
+      "body": {
+        "type": "none",
+        "content": ""
+      },
+      "createdAt": 1769551161981,
+      "updatedAt": 1769551200328
+    }
+  ],
+  "storageType": "repo",
+  "createdAt": 1769551161980,
+  "updatedAt": 1769551354785,
+  "variables": {
+    "baseuri": "https://tempstickapi.com/api/v1"
+  },
+  "defaultHeaders": [
+    {
+      "name": "baseuri",
+      "value": "https://tempstickapi.com/api/v1",
+      "enabled": true
+    },
+    {
+      "name": "User-Agent",
+      "value": "Endpoint for VS Code/0.1.53",
+      "enabled": true
+    },
+    {
+      "name": "Accept-Encoding",
+      "value": "gzip, deflate",
+      "enabled": true
+    },
+    {
+      "name": "Cache-Control",
+      "value": "no-cache",
+      "enabled": true
+    }
+  ],
+  "defaultAuth": {
+    "type": "none"
+  }
+}
