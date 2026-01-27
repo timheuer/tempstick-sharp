@@ -1,4 +1,7 @@
-﻿namespace TempStick;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace TempStick;
 
 public class BooleanConverter : JsonConverter<bool>
 {
